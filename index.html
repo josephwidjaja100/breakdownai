@@ -6,8 +6,68 @@
     <title>Breakdown</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=PT+Sans+Narrow:wght@400;700&family=Raleway:wght@200;500&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   </head>
-  <body>
 
+  <body>
+    <div class="sidebar">
+      <div class="logo">
+        <img src="logo.png" class="logo-img">
+      </div>
+      <div class="title-text">
+        <h1>
+          breakdown.ai
+        </h1>
+        <h2>
+          start learning <span>now</span>
+        </h2>
+      </div>
+      <div class="input-box">
+        <p>
+          Upload your notes or record a lecture to generate a graph:
+        </p>
+        <div class="input-buttons">
+          <button class="upload-button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upload-svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Upload
+          </button>
+          <button class="record-button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="record-svg">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            Record
+          </button>
+        </div>
+      </div>
+      <div class="instructions-box">
+        <p>
+          How to use:
+        </p>
+        <li>
+          Upload a document or record audio, and our AI will automatically take your topic and break it down to subtopics
+        </li>
+        <li>
+          Click on a subtopic node to see an explanation in this sidebar
+        </li>
+        <li>
+          Hover over a node and click the expand button to break down the subtopic into smaller subsubtopics
+        </li>
+        <li>
+          Zoom/pan in or out using your mouse 
+        </li>
+      </div>
+    </div>
+    <div class="dotted-grid"></div>
   </body>
+
+  <script src="script.js"></script>
 </html>
