@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Breakdown</title>
+    <title>Breakdown AI</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=PT+Sans+Narrow:wght@400;700&family=Raleway:wght@200;500&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="iconbg.png">
   </head>
 
   <body>
@@ -26,7 +27,7 @@
       </div>
       <div class="input-box">
         <p>
-          Upload your notes or record a lecture to generate a graph:
+          Upload your PDF notes or record a lecture to generate a graph:
         </p>
         <div class="input-buttons">
           <button class="upload-button">
@@ -37,6 +38,7 @@
             </svg>
             Upload
           </button>
+          <input type="file" id="file-upload" accept=".pdf" style="display: none;">
           <button class="record-button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="record-svg">
               <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
@@ -53,7 +55,7 @@
           How to use:
         </p>
         <li>
-          Upload a document or record audio, and our AI will automatically take your topic and break it down to subtopics
+          Upload a PDF document or record audio, and our AI will automatically take your topic and break it down to subtopics
         </li>
         <li>
           Click on a subtopic node to see an explanation in this sidebar
@@ -66,8 +68,20 @@
         </li>
       </div>
     </div>
-    <div class="dotted-grid"></div>
+    <!-- <div class="dotted-grid"></div> -->
+    <div id="canvas" class="canvas"></canvas>
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-container">
+        <div class="loading-text">Processing document with AI...</div>
+        <div class="loading-bar">
+          <div class="loading-progress" id="loadingProgress"></div>
+        </div>
+      </div>
+    </div>
   </body>
 
   <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';</script> 
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 </html>
