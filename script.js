@@ -29,7 +29,7 @@ document.getElementById('file-upload').addEventListener('change', async function
       if (progress >= 100) {
         clearInterval(progressInterval);
       }
-    }, 1200);
+    }, 200);
 
     const file = document.getElementById('file-upload').files[0];
     if(!file){
@@ -48,15 +48,22 @@ document.getElementById('file-upload').addEventListener('change', async function
 
     console.log('Selected File:', file);
     console.log('Extracted Text:',extractedText);
-    const prompt = "read the following document and provide a 3-7 word description of the main topic, then divide that topic into as many subtopics as necessary, all of which also 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. A NEW LINE IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list INCLUDING THE MAIN TOPIC and a corresponding 200-400 word explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
+    const prompt = "read the following document and provide a 3-7 word description of the main topic, then divide that topic into as many subtopics as necessary, all of which also 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. A NEW LINE IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list INCLUDING THE MAIN TOPIC and a corresponding 200-400 word explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, DO NOT MAKE ANY OF THE TOPICS, SUBTOPICS, OR DESCRIPTIONS HAVE ANY CHARACTERS OTHER THAN THOSE THAT ARE ALPHANUMERIC OR SPACES, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
     const result = await callGemini(prompt, extractedText);
     console.log(result.response);
     createGraphData(result.response);
     console.log("graph:",graph);
     console.log("descriptions:",descriptions);
 
-    for(let description in descriptions){
-      node_names.push(description);
+    for(let u in graph){
+      if(!node_names.includes(u)){
+        node_names.push(u);
+      }
+      for(let v of graph[u]){
+        if(!node_names.includes(v)){
+          node_names.push(v);
+        }
+      }
     }
 
     let isStart = []; 
@@ -91,7 +98,8 @@ document.getElementById('file-upload').addEventListener('change', async function
       node_con.push({source: -1, target: []});
     }
     
-    dfs(node_names[0], node_names[0]);
+    dfs(node_names[0], node_names[0], 0);
+    console.log("dfs complete");
 
     initSimulation();
   }
@@ -100,7 +108,7 @@ document.getElementById('file-upload').addEventListener('change', async function
     alert("Processing failed. Please try again.");
   }
   finally {
-    // Hide loading overlay after a brief delay to show completion
+    loadingProgress.style.width = '100%';
     setTimeout(() => {
       loadingOverlay.style.display = 'none';
     }, 500);
@@ -109,12 +117,18 @@ document.getElementById('file-upload').addEventListener('change', async function
 
 function dfs(current, parent, depth){
   console.log("current:", current);
+  console.log("parent:", parent);
   node_con[node_names.indexOf(current)].source = node_names.indexOf(parent);
+  console.log("hello1");
   node_pos[node_names.indexOf(current)].depth = depth;
-  
-  for(let next of graph[current]){
-    node_con[node_names.indexOf(current)].target.push(next);
-    dfs(next, current, depth + 1);
+  console.log("hello2");
+  if(!(graph[current] === undefined)){
+    console.log(graph[current]);
+    for(let next of graph[current]){
+      console.log(next);
+      node_con[node_names.indexOf(current)].target.push(next);
+      dfs(next, current, depth + 1);
+    }
   }
 }
 
@@ -122,7 +136,8 @@ function initSimulation() {
   const maxDepth = Math.max(...node_pos.map(d => d.depth || 0));
   const colorScale = d3.scaleLinear()
     .domain([0, maxDepth])
-    .range(["#00c8ff", "#0287ac"]);
+    .range(["#00c8ff", "#01485c"]);
+  console.log("hi1");
 
   let nodes = node_names.map((name, i) => ({
     id: i,
@@ -131,8 +146,12 @@ function initSimulation() {
     y: node_pos[i].y,
     r: node_radius,
     depth: node_pos[i].depth || 0,
-    color: colorScale(node_pos[i].depth || 0)
+    color: colorScale(node_pos[i].depth || 0),
+    isRoot: node_pos[i].depth == 0
   }));
+  console.log("hi2");
+
+  const rootNode = nodes.find(node => node.isRoot);
   
   let links = [];
   node_con.forEach((con, i) => {
@@ -145,26 +164,48 @@ function initSimulation() {
     }
   });
   
-  // Clear previous simulation if any
   if (window.simulation) {
     window.simulation.stop();
   }
   
-  // Create SVG instead of using Canvas
   const svg = d3.select("#canvas")
-    .html("") // Clear existing
+    .html("")
     .append("svg")
     .attr("width", width)
     .attr("height", height);
   
-  // Create simulation
   window.simulation = d3.forceSimulation(nodes)
     .force('link', d3.forceLink(links).id(d => d.id))
     .force('collide', d3.forceCollide().radius(d => d.r + 10).strength(1))
     .force('charge', d3.forceManyBody().strength(-100))
-    .force('center', d3.forceCenter(width/2, height/2));
+    .force('center', d3.forceCenter(width/2, height/2))
+    .force('rootForce', () => {
+      if (rootNode) {
+        rootNode.x = width/2;
+        rootNode.y = height/2;
+      }
+    })
+    .force('x', d3.forceX(width/2).strength(0.025))
+    .force('y', d3.forceY(height/2).strength(0.025))
+    .on('tick', () => {
+      nodes.forEach(node => {
+          node.x = Math.max(node.r, Math.min(width - node.r, node.x));
+          node.y = Math.max(node.r, Math.min(height - node.r, node.y));
+        });
+
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+      
+      node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+      
+      label.attr("transform", d => `translate(${d.x},${d.y})`)
+    });
   
-  // Create links
   const link = svg.append("g")
     .selectAll("line")
     .data(links)
@@ -172,7 +213,6 @@ function initSimulation() {
     .attr("stroke", "#999")
     .attr("stroke-width", 1.5);
   
-  // Create nodes
   const node = svg.append("g")
     .selectAll("circle")
     .data(nodes)
@@ -187,7 +227,7 @@ function initSimulation() {
       d3.select(event.currentTarget)
         .attr("stroke", "black")
         .attr("stroke-width", 2);
-      label.filter(dd => dd.id === d.id).style("visibility", "visible");
+      label.filter(dd => dd.id === d.id).style("visibility", "visible").raise();
     })
     .on("mouseout", function(event, d) {
       d3.select(event.currentTarget)
@@ -199,31 +239,47 @@ function initSimulation() {
       .on("drag", dragged)
       .on("end", dragended));
   
-  // Add labels
+  const fontSize = "18px";
+  const fontFamily = "Outfit";
+  const padding = 10;
+  const verticalPadding = 5; 
+
   const label = svg.append("g")
-    .selectAll("text")
+    .selectAll("g")
     .data(nodes)
-    .enter().append("text")
-    .attr("dy", -25)
-    .text(d => d.name)
-    .style("font-size", "20px")
-    .style("visibility", "hidden");
-  
-  // Update positions on tick
-  simulation.on('tick', () => {
-    link
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
+    .enter().append("g")
+    .style("visibility", "hidden")
+    .attr("transform", d => `translate(${d.x},${d.y})`);
+
+  const textMeasure = document.createElement("canvas");
+  const ctx = textMeasure.getContext("2d");
+  ctx.font = `${fontSize} ${fontFamily}`;
+
+  label.each(function(d) {
+    const textWidth = ctx.measureText(d.name).width;
+    const bboxWidth = textWidth + padding * 2;
+    const bboxHeight = parseInt(fontSize) + verticalPadding * 2;
     
-    node
-      .attr("cx", d => d.x)
-      .attr("cy", d => d.y);
+    d3.select(this)
+      .append("rect")
+      .attr("x", -bboxWidth/2)
+      .attr("y", -bboxHeight - 5)
+      .attr("width", bboxWidth)
+      .attr("height", bboxHeight)
+      .attr("rx", 4)
+      .attr("ry", 4)
+      .attr("fill", "white")
+      .attr("stroke", "#aaa")
+      .attr("stroke-width", 1);
     
-    label
-      .attr("x", d => d.x)
-      .attr("y", d => d.y);
+    d3.select(this)
+      .append("text")
+      .attr("dy", -bboxHeight/2 - 5 + parseInt(fontSize)/3)
+      .text(d.name)
+      .style("font-size", fontSize)
+      .style("font-family", fontFamily)
+      .style("text-anchor", "middle")
+      .style("pointer-events", "none");
   });
   
   function dragstarted(event, d) {
@@ -242,6 +298,7 @@ function initSimulation() {
     d.fx = null;
     d.fy = null;
   }
+  
 }
 
 function createGraphData(response){
