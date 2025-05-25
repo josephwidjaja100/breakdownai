@@ -22,7 +22,6 @@ document.getElementById("uploadButton").addEventListener("click", function(){
 });
 
 document.getElementById("file-upload").addEventListener("change", async function() {
-  descriptionBox.style.visibilty = "hidden";
   extractedText = "";
   graph = {};
   descriptions = {};
@@ -46,6 +45,8 @@ document.getElementById("file-upload").addEventListener("change", async function
         clearInterval(progressInterval);
       }
     }, 200);
+
+    descriptionBox.style.visibilty = "hidden";
 
     const file = document.getElementById("file-upload").files[0];
     if(!file){
@@ -83,7 +84,7 @@ document.getElementById("file-upload").addEventListener("change", async function
 document.getElementById("searchButton").addEventListener("click", async function(){
   let searchText = document.getElementById("textInput").value;
   if(searchText != ""){
-    descriptionBox.style.visibilty = "hidden";
+    descriptionBox.style.visibility = "hidden";
     graph = {};
     descriptions = {};
     node_names = [];
@@ -107,7 +108,7 @@ document.getElementById("searchButton").addEventListener("click", async function
         }
       }, 200);
 
-      const prompt = "for the following topic provided, divide that topic into as many subtopics as necessary, all of which 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 BUT GREATER THAN 30, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. A NEW LINE IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list INCLUDING THE MAIN TOPIC and a corresponding 200-400 word extensive, extremely informative, expert level, explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, DO NOT MAKE ANY OF THE TOPICS, SUBTOPICS, OR DESCRIPTIONS HAVE ANY CHARACTERS OTHER THAN THOSE THAT ARE ALPHANUMERIC OR SPACES, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND GREATER THAN 30 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND GREATER THAN 30 AND ALSO THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
+      const prompt = "for the following topic provided, divide that topic into as many subtopics as necessary, all of which 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 BUT GREATER THAN 30, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. A NEW LINE IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list AND ONLY THE SUBTOPICS MENTIONED IN THE ADJACENCY LIST INCLUDING THE MAIN TOPIC and a corresponding 200-400 word extensive, extremely informative, expert level, explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, DO NOT MAKE ANY OF THE TOPICS, SUBTOPICS, OR DESCRIPTIONS HAVE ANY CHARACTERS OTHER THAN THOSE THAT ARE ALPHANUMERIC OR SPACES, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND GREATER THAN 30 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND GREATER THAN 30 AND ALSO THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
       const result = await callGemini(prompt, searchText);
       await generateSimulation(result);
     }
@@ -356,7 +357,8 @@ function initSimulation() {
     .data(nodes)
     .enter().append("g")
     .style("visibility", "hidden")
-    .attr("transform", d => `translate(${d.x},${d.y})`);
+    .attr("transform", d => `translate(${d.x},${d.y})`)
+    .style("pointer-events", "none");
 
   const textMeasure = document.createElement("canvas");
   const ctx = textMeasure.getContext("2d");

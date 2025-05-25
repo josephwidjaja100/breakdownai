@@ -87,7 +87,11 @@ span{
   grid-template-columns: 1fr 50px;
 }
 .text-input{
+  margin: 0px;
   font-size: 20px;
+}
+.search-button{
+  margin: 0px;
 }
 .input-box, .instructions-box{
   background-color:rgb(187, 240, 255);
