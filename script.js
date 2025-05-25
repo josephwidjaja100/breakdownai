@@ -6,19 +6,35 @@ let node_pos = [];
 let node_con = [];
 let start_node_name = "";
 let start_node_index = -1;
-let rect = document.getElementById('canvas').getBoundingClientRect();
+let rect = document.getElementById("canvas").getBoundingClientRect();
 let width = rect.width;
 let height = rect.height;
 let node_radius = 20;
+let initDescX  = -1;
+let initDescY = -1;
+let isMoving = false;
+let descriptionBox = document.getElementById("descriptionContainer");
+let descriptionHeader = document.getElementById("descriptionHeading");
+let descriptionText = document.getElementById("descriptionText");
 
-document.querySelector('.upload-button').addEventListener('click', function(){
-  document.getElementById('file-upload').click();
+document.getElementById("uploadButton").addEventListener("click", function(){
+  document.getElementById("file-upload").click();
 });
 
-document.getElementById('file-upload').addEventListener('change', async function() {
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  const loadingProgress = document.getElementById('loadingProgress');
-  loadingOverlay.style.display = 'flex';
+document.getElementById("file-upload").addEventListener("change", async function() {
+  descriptionBox.style.visibilty = "hidden";
+  extractedText = "";
+  graph = {};
+  descriptions = {};
+  node_names = [];
+  node_pos = [];
+  node_con = [];
+  start_node_name = "";
+  start_node_index = -1;
+
+  const loadingOverlay = document.getElementById("loadingOverlay");
+  const loadingProgress = document.getElementById("loadingProgress");
+  loadingOverlay.style.display = "flex";
 
   try{
     let progress = 0;
@@ -31,14 +47,14 @@ document.getElementById('file-upload').addEventListener('change', async function
       }
     }, 200);
 
-    const file = document.getElementById('file-upload').files[0];
+    const file = document.getElementById("file-upload").files[0];
     if(!file){
       return;
     }
 
-    const fileType = file.name.split('.').pop().toLowerCase();
+    const fileType = file.name.split(".").pop().toLowerCase();
 
-    if(fileType == 'pdf'){
+    if(fileType == "pdf"){
       extractedText = await extractPDF(file);
     }
     else{
@@ -46,73 +62,154 @@ document.getElementById('file-upload').addEventListener('change', async function
       return;
     }
 
-    console.log('Selected File:', file);
-    console.log('Extracted Text:',extractedText);
-    const prompt = "read the following document and provide a 3-7 word description of the main topic, then divide that topic into as many subtopics as necessary, all of which also 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. A NEW LINE IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list INCLUDING THE MAIN TOPIC and a corresponding 200-400 word explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, DO NOT MAKE ANY OF THE TOPICS, SUBTOPICS, OR DESCRIPTIONS HAVE ANY CHARACTERS OTHER THAN THOSE THAT ARE ALPHANUMERIC OR SPACES, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
+    console.log("Selected File:", file);
+    console.log("Extracted Text:",extractedText);
+    const prompt = "read the following document and provide a 3-7 word description of the main topic, then divide that topic into as many subtopics as necessary, all of which also 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 BUT GREATER THAN 30, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. A NEW LINE IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list INCLUDING THE MAIN TOPIC and a corresponding 200-400 word extensive, extremely informative, expert level, explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, DO NOT MAKE ANY OF THE TOPICS, SUBTOPICS, OR DESCRIPTIONS HAVE ANY CHARACTERS OTHER THAN THOSE THAT ARE ALPHANUMERIC OR SPACES, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND GREATER THAN 30 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND GREATER THAN 30 AND ALSO THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
     const result = await callGemini(prompt, extractedText);
-    console.log(result.response);
-    createGraphData(result.response);
-    console.log("graph:",graph);
-    console.log("descriptions:",descriptions);
-
-    for(let u in graph){
-      if(!node_names.includes(u)){
-        node_names.push(u);
-      }
-      for(let v of graph[u]){
-        if(!node_names.includes(v)){
-          node_names.push(v);
-        }
-      }
-    }
-
-    let isStart = []; 
-    for(let i = 0; i < node_names.length; i++){
-      isStart.push(true);
-    }
-
-    for(let u in graph){
-      console.log(u);
-      console.log(graph[u]);
-      for(let v of graph[u]){
-        console.log(v);
-        console.log(node_names.indexOf(v));
-        isStart[node_names.indexOf(v)] = false;
-      }
-    }
-
-    for(let i = 0; i < node_names.length; i++){
-      if(isStart[i]){
-        start_node_name = node_names[i];
-        start_node_index = i;
-      }
-    }
-
-    console.log(node_names);
-    console.log(isStart);
-    console.log(start_node_name);
-    console.log(start_node_index);
-
-    for(let i = 0; i < node_names.length; i++){
-      node_pos.push({x: width/2, y: height/2, r: node_radius, depth: 0});
-      node_con.push({source: -1, target: []});
-    }
-    
-    dfs(node_names[0], node_names[0], 0);
-    console.log("dfs complete");
-
-    initSimulation();
+    await generateSimulation(result);
   }
   catch (error){
     console.error("Error:",error);
     alert("Processing failed. Please try again.");
   }
   finally {
-    loadingProgress.style.width = '100%';
+    loadingProgress.style.width = "100%";
     setTimeout(() => {
-      loadingOverlay.style.display = 'none';
+      loadingOverlay.style.display = "none";
     }, 500);
   }
+});
+
+document.getElementById("searchButton").addEventListener("click", async function(){
+  let searchText = document.getElementById("textInput").value;
+  if(searchText != ""){
+    descriptionBox.style.visibilty = "hidden";
+    graph = {};
+    descriptions = {};
+    node_names = [];
+    node_pos = [];
+    node_con = [];
+    start_node_name = "";
+    start_node_index = -1;
+
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    const loadingProgress = document.getElementById("loadingProgress");
+    loadingOverlay.style.display = "flex";
+
+    try{
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 1;
+        loadingProgress.style.width = `${progress}%`;
+        
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+        }
+      }, 200);
+
+      const prompt = "for the following topic provided, divide that topic into as many subtopics as necessary, all of which 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 BUT GREATER THAN 30, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. A NEW LINE IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list INCLUDING THE MAIN TOPIC and a corresponding 200-400 word extensive, extremely informative, expert level, explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, DO NOT MAKE ANY OF THE TOPICS, SUBTOPICS, OR DESCRIPTIONS HAVE ANY CHARACTERS OTHER THAN THOSE THAT ARE ALPHANUMERIC OR SPACES, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND GREATER THAN 30 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND GREATER THAN 30 AND ALSO THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
+      const result = await callGemini(prompt, searchText);
+      await generateSimulation(result);
+    }
+    catch (error){
+      console.error("Error:",error);
+      alert("Processing failed. Please try again.");
+    }
+    finally {
+      loadingProgress.style.width = "100%";
+      setTimeout(() => {
+        loadingOverlay.style.display = "none";
+      }, 500);
+    }
+  }
+});
+
+async function generateSimulation(result){
+  console.log(result.response);
+  createGraphData(result.response);
+  console.log("graph:",graph);
+  console.log("descriptions:",descriptions);
+
+  for(let u in graph){
+    if(!node_names.includes(u)){
+      node_names.push(u);
+    }
+    for(let v of graph[u]){
+      if(!node_names.includes(v)){
+        node_names.push(v);
+      }
+    }
+  }
+
+  let isStart = []; 
+  for(let i = 0; i < node_names.length; i++){
+    isStart.push(true);
+  }
+
+  for(let u in graph){
+    console.log(u);
+    console.log(graph[u]);
+    for(let v of graph[u]){
+      console.log(v);
+      console.log(node_names.indexOf(v));
+      isStart[node_names.indexOf(v)] = false;
+    }
+  }
+
+  for(let i = 0; i < node_names.length; i++){
+    if(isStart[i]){
+      start_node_name = node_names[i];
+      start_node_index = i;
+    }
+  }
+
+  console.log(node_names);
+  console.log(isStart);
+  console.log(start_node_name);
+  console.log(start_node_index);
+
+  for(let i = 0; i < node_names.length; i++){
+    node_pos.push({x: width/2, y: height/2, r: node_radius, depth: 0});
+    node_con.push({source: -1, target: []});
+  }
+  
+  dfs(node_names[0], node_names[0], 0);
+  console.log("dfs complete");
+
+  initSimulation();
+}
+descriptionBox.addEventListener("mousedown", (e) => {
+  console.log(window.getComputedStyle(descriptionBox).visbility);
+  if(window.getComputedStyle(descriptionBox).visbility != "hidden"){
+    initDescX = e.clientX;
+    initDescY = e.clientY;
+    isMoving = true;
+  }
+});
+
+descriptionBox.addEventListener("mousemove", (e) => {
+  if(isMoving && window.getComputedStyle(descriptionBox).visbility != "hidden"){
+    descriptionBox.style.top = descriptionBox.offsetTop - (initDescY - e.clientY) + "px";
+    descriptionBox.style.left = descriptionBox.offsetLeft - (initDescX - e.clientX) + "px";
+    initDescX = e.clientX;
+    initDescY = e.clientY;
+  }
+});
+
+descriptionBox.addEventListener("mouseup", (e) => {
+  if(window.getComputedStyle(descriptionBox).visbility != "hidden"){
+    isMoving = false;
+  }
+});
+
+descriptionBox.addEventListener("mouseleave", (e) => {
+  if(window.getComputedStyle(descriptionBox).visbility != "hidden"){
+    isMoving = false;
+  }
+});
+
+document.getElementById("closeButton").addEventListener("click", function(){
+  descriptionBox.style.visibility = "hidden";
 });
 
 function dfs(current, parent, depth){
@@ -149,6 +246,7 @@ function initSimulation() {
     color: colorScale(node_pos[i].depth || 0),
     isRoot: node_pos[i].depth == 0
   }));
+
   console.log("hi2");
 
   const rootNode = nodes.find(node => node.isRoot);
@@ -175,19 +273,19 @@ function initSimulation() {
     .attr("height", height);
   
   window.simulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id))
-    .force('collide', d3.forceCollide().radius(d => d.r + 10).strength(1))
-    .force('charge', d3.forceManyBody().strength(-100))
-    .force('center', d3.forceCenter(width/2, height/2))
-    .force('rootForce', () => {
+    .force("link", d3.forceLink(links).id(d => d.id))
+    .force("collide", d3.forceCollide().radius(d => d.r + 10).strength(1))
+    .force("charge", d3.forceManyBody().strength(-100))
+    .force("center", d3.forceCenter(width/2, height/2))
+    .force("rootForce", () => {
       if (rootNode) {
         rootNode.x = width/2;
         rootNode.y = height/2;
       }
     })
-    .force('x', d3.forceX(width/2).strength(0.025))
-    .force('y', d3.forceY(height/2).strength(0.025))
-    .on('tick', () => {
+    .force("x", d3.forceX(width/2).strength(0.025))
+    .force("y", d3.forceY(height/2).strength(0.025))
+    .on("tick", () => {
       nodes.forEach(node => {
           node.x = Math.max(node.r, Math.min(width - node.r, node.x));
           node.y = Math.max(node.r, Math.min(height - node.r, node.y));
@@ -233,6 +331,15 @@ function initSimulation() {
       d3.select(event.currentTarget)
         .attr("stroke", null);
       label.filter(dd => dd.id === d.id).style("visibility", "hidden");
+    })
+    .on("click", function(event, d) {
+      descriptionBox.style.visibility = "visible";
+      descriptionBox.style.opacity = "1";
+      setTimeout(() => {
+        descriptionBox.style.opacity = "0.5";
+      }, 1000);
+      descriptionHeader.textContent = node_names[d.id];
+      descriptionText.textContent = descriptions[node_names[d.id]] || "No Description Available";
     })
     .call(d3.drag()
       .on("start", dragstarted)
@@ -302,9 +409,9 @@ function initSimulation() {
 }
 
 function createGraphData(response){
-  let adjacency_plaintext = response.substring(response.indexOf('adjacency_list = {'), response.indexOf('}')+1);
-  let explanation_plaintext = response.substring(response.indexOf('explanation_list = {'), response.lastIndexOf('}')+1);
-  console.log(adjacency_plaintext);
+  let adjacency_plaintext = response.substring(response.indexOf("adjacency_list = {"), response.indexOf("}")+1);
+  let explanation_plaintext = response.substring(response.indexOf("explanation_list = {"), response.lastIndexOf("}")+1);
+  console.log(adjacency_plaintext);                                                     
   console.log(explanation_plaintext);
   
   let adjacency_split = adjacency_plaintext.split("\n");
@@ -373,13 +480,13 @@ async function extractPDF(file){
 
 async function callGemini(prompt, text) {
   try {
-    const response = await fetch('http://localhost:3000/api/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("http://localhost:3000/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt, text }),
     });
     if (!response.ok) {
-      const errorData = await response.json(); // Parse error response
+      const errorData = await response.json(); 
       console.error("Backend error:", errorData);
       throw new Error(errorData.error || "API request failed");
     }

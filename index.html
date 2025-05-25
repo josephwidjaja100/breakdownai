@@ -27,26 +27,24 @@
       </div>
       <div class="input-box">
         <p>
-          Upload your PDF notes or record a lecture to generate a graph:
+          Upload your PDF notes or type a topic to generate a graph:
         </p>
-        <div class="input-buttons">
-          <button class="upload-button">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upload-svg">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
+        <button class="upload-button" id="uploadButton">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upload-svg">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Upload
+        </button>
+        <input type="file" id="file-upload" accept=".pdf" style="display: none;">
+        <div class="text-input-container">
+          <input type="text" class="text-input" id="textInput">
+          <button class="search-button" id="searchButton">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-svg">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            Upload
-          </button>
-          <input type="file" id="file-upload" accept=".pdf" style="display: none;">
-          <button class="record-button">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="record-svg">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-              <line x1="12" y1="19" x2="12" y2="23"></line>
-              <line x1="8" y1="23" x2="16" y2="23"></line>
-            </svg>
-            Record
           </button>
         </div>
       </div>
@@ -58,7 +56,7 @@
           Upload a PDF document or record audio, and our AI will automatically take your topic and break it down to subtopics
         </li>
         <li>
-          Click on a subtopic node to see an explanation in this sidebar
+          Click on a subtopic node to see an explanation
         </li>
         <li>
           Hover over a node and click the expand button to break down the subtopic into smaller subsubtopics
@@ -69,10 +67,17 @@
       </div>
     </div>
     <!-- <div class="dotted-grid"></div> -->
-    <div id="canvas" class="canvas"></canvas>
+
+    <div id="canvas" class="canvas"></div>
+    <div class="description-container" id="descriptionContainer">
+      <div class="description-heading" id="descriptionHeading">Description</div>
+      <div class="description-text" id="descriptionText">a;sldkfja;lsdjkfas</div>
+      <button class="close-button" id="closeButton">X</button>
+    </div>
+
     <div class="loading-overlay" id="loadingOverlay">
       <div class="loading-container">
-        <div class="loading-text">Processing document with AI...</div>
+        <div class="loading-text">Processing Document...</div>
         <div class="loading-bar">
           <div class="loading-progress" id="loadingProgress"></div>
         </div>
