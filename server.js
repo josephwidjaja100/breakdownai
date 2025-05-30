@@ -10,12 +10,24 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], 
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      connectSrc: ["'self'", "https://generativelanguage.googleapis.com"],
-      frameSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'", 
+        "https://d3js.org",
+        "https://cdnjs.cloudflare.com"
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com"
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com"
+      ],
+      connectSrc: ["'self'"],
+      frameSrc: ["'self'"]
     },
   })
 );
@@ -28,6 +40,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use(express.static('public'));
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); 
 app.post('/api/gemini', async (req, res) => {
