@@ -11,16 +11,5 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://d3js.org https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-src 'self'"
-        }
-      ]
-    }
   ]
 }
