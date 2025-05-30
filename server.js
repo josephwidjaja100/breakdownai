@@ -3,27 +3,29 @@ const helmet = require('helmet');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config(); 
 
-const app = express();
+const app = express(); 
+
+app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], 
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'", "https://generativelanguage.googleapis.com"],
+      frameSrc: ["'self'"],
+    },
+  })
+);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
-}); 
-
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'none'"],
-      imgSrc: ["'self'", "data:"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"], 
-      fontSrc: ["'self'"],
-      connectSrc: ["'self'"],
-    },
-  })
-);
+});
 
 app.use(express.json());
 
