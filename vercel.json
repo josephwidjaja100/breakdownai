@@ -14,7 +14,7 @@
   ],
   "headers": [
     {
-      "src": "/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
