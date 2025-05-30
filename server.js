@@ -1,5 +1,6 @@
 const express = require('express');
 const helmet = require('helmet');
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config(); 
 
@@ -41,6 +42,11 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); 
 app.post('/api/gemini', async (req, res) => {
