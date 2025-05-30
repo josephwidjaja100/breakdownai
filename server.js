@@ -25,10 +25,6 @@ app.use(
   })
 );
 
-app.get('/', (req, res) => {
-  res.send('<img src="data:image/png;base64,...">'); 
-});
-
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); 
