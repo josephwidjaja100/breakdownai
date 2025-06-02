@@ -6,33 +6,6 @@ require('dotenv').config();
 
 const app = express(); 
 
-// app.use(helmet());
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: ["'self'"],
-//       imgSrc: ["'self'", "data:", "https:"],
-//       scriptSrc: [
-//         "'self'",
-//         "'unsafe-inline'", 
-//         "https://d3js.org",
-//         "https://cdnjs.cloudflare.com"
-//       ],
-//       styleSrc: [
-//         "'self'",
-//         "'unsafe-inline'",
-//         "https://fonts.googleapis.com"
-//       ],
-//       fontSrc: [
-//         "'self'",
-//         "https://fonts.gstatic.com"
-//       ],
-//       connectSrc: ["'self'"],
-//       frameSrc: ["'self'"]
-//     },
-//   })
-// );
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');

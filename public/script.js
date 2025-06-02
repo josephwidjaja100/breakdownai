@@ -63,8 +63,8 @@ document.getElementById("file-upload").addEventListener("change", async function
       return;
     }
 
-    console.log("Selected File:", file);
-    console.log("Extracted Text:",extractedText);
+    // console.log("Selected File:", file);
+    // console.log("Extracted Text:",extractedText);
     const prompt = "read the following document and provide a 3-7 word description of the main topic, then divide that topic into as many subtopics as necessary, all of which also 3-7 words, and divide the subtopics into even more subtopics until it is not necessary for a subtopic to be divided, !!! VERY IMPORTANT -> THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 BUT GREATER THAN 30, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM structure the topics and subtopics as an adjacency list in js code, if a topic is off limits for you simply ignore it and continue creating the list, DO NOT SEPARATE A TOPIC FROM ITS SUBTOPICS IN THE LIST USING MULTIPLE LINES, A TOPIC MUST BE ON THE SAME LINE AS ALL OF ITS SUBTOPICS. Put all subtopics of a parent topic on the same line as the parent topic, do not put them on all separate lines. EVERY TOPIC AND SUBTOPIC EVER MENTIONED IN THE ADJACENCY LIST SHOULD HAVE ITS OWN LINE IN THE ADJACENCY LIST EVEN IF IT HAS AN EMPTY LIST OF SUBTOPICS. !!!! EXTREMELY IMPORTANT ABOVE ALL ELSE -> A NEW TOPIC IN THE ADJACENCY LIST SHOULD ONLY BE CREATED IF AND ONLY IF THE TOPIC IS A SUBTOPIC OF A PREVIOUS SUBTOPIC OR THE MAIN TOPIC. Additionally, create a dictionary containing EVERY single subtopic that was EVER MENTIONED in the adjacency list AND ONLY THE SUBTOPICS MENTIONED IN THE ADJACENCY LIST INCLUDING THE MAIN TOPIC and a corresponding 200-400 word extensive, extremely informative, expert level, explanation of that subtopic and its relation to its parent topic if it has one also in the same code format, and similarly, IMPORTANT: IF A TOPIC IS OFF LIMITS, JUST MOVE PAST IT AND DO NOT STOP THE RESPONSE AND CONTINUE CREATING THE LISTS, no comments, DO NOT MAKE ANY OF THE TOPICS, SUBTOPICS, OR DESCRIPTIONS HAVE ANY CHARACTERS OTHER THAN THOSE THAT ARE ALPHANUMERIC OR SPACES, make the name of the adjacency list adjacency_list and the name of the explanation list explanation_list, make it as python code, I need the adjacency_list like a graph structure, THE TOTAL NUMBER OF ITEMS IN THE ADJACENCY LIST MUST BE LESS THAN 60 AND GREATER THAN 30 AND THE TOTAL NUMBER OF ITEMS IN THE EXPLANATION LIST SHOULD ALSO BE LESS THAN 60 AND GREATER THAN 30 AND ALSO THE SAME NUMBER AS THE NUMBER IN THE ADJACENCY LIST, IF MORE THAN 60 ARE PROVIDED, CUT OUT EVERYTHING PAST THE 60TH ITEM, format it as the following format: \nadjacency_list = {\n\t\"topic\": [\"subtopic 1\", \"subtopic 2\", \"subtopic 3\"]\n\"subtopic 1\": [\"subsubtopic 1\", \"subsubtopic 2\"]\n...\n}\nexplanation_list = {\n\t\"topic\": \"explanation of topic\"\n\"subtopic 1\": \"explanation of subtopic 1\"\n...\n}";
     const result = await callGemini(prompt, extractedText);
     await generateSimulation(result);
@@ -126,10 +126,10 @@ document.getElementById("searchButton").addEventListener("click", async function
 });
 
 async function generateSimulation(result){
-  console.log(result.response);
+  // console.log(result.response);
   createGraphData(result.response);
-  console.log("graph:",graph);
-  console.log("descriptions:",descriptions);
+  // console.log("graph:",graph);
+  // console.log("descriptions:",descriptions);
 
   for(let u in graph){
     if(!node_names.includes(u)){
@@ -148,11 +148,11 @@ async function generateSimulation(result){
   }
 
   for(let u in graph){
-    console.log(u);
-    console.log(graph[u]);
+    // console.log(u);
+    // console.log(graph[u]);
     for(let v of graph[u]){
-      console.log(v);
-      console.log(node_names.indexOf(v));
+      // console.log(v);
+      // console.log(node_names.indexOf(v));
       isStart[node_names.indexOf(v)] = false;
     }
   }
@@ -164,10 +164,10 @@ async function generateSimulation(result){
     }
   }
 
-  console.log(node_names);
-  console.log(isStart);
-  console.log(start_node_name);
-  console.log(start_node_index);
+  // console.log(node_names);
+  // console.log(isStart);
+  // console.log(start_node_name);
+  // console.log(start_node_index);
 
   for(let i = 0; i < node_names.length; i++){
     node_pos.push({x: width/2, y: height/2, r: node_radius, depth: 0});
@@ -175,12 +175,12 @@ async function generateSimulation(result){
   }
   
   dfs(node_names[0], node_names[0], 0);
-  console.log("dfs complete");
+  // console.log("dfs complete");
 
   initSimulation();
 }
 descriptionBox.addEventListener("mousedown", (e) => {
-  console.log(window.getComputedStyle(descriptionBox).visbility);
+  // console.log(window.getComputedStyle(descriptionBox).visbility);
   if(window.getComputedStyle(descriptionBox).visbility != "hidden"){
     initDescX = e.clientX;
     initDescY = e.clientY;
@@ -214,16 +214,16 @@ document.getElementById("closeButton").addEventListener("click", function(){
 });
 
 function dfs(current, parent, depth){
-  console.log("current:", current);
-  console.log("parent:", parent);
+  // console.log("current:", current);
+  // console.log("parent:", parent);
   node_con[node_names.indexOf(current)].source = node_names.indexOf(parent);
-  console.log("hello1");
+  // console.log("hello1");
   node_pos[node_names.indexOf(current)].depth = depth;
-  console.log("hello2");
+  // console.log("hello2");
   if(!(graph[current] === undefined)){
-    console.log(graph[current]);
+    // console.log(graph[current]);
     for(let next of graph[current]){
-      console.log(next);
+      // console.log(next);
       node_con[node_names.indexOf(current)].target.push(next);
       dfs(next, current, depth + 1);
     }
@@ -235,7 +235,7 @@ function initSimulation() {
   const colorScale = d3.scaleLinear()
     .domain([0, maxDepth])
     .range(["#00c8ff", "#01485c"]);
-  console.log("hi1");
+  // console.log("hi1");
 
   let nodes = node_names.map((name, i) => ({
     id: i,
@@ -248,7 +248,7 @@ function initSimulation() {
     isRoot: node_pos[i].depth == 0
   }));
 
-  console.log("hi2");
+  // console.log("hi2");
 
   const rootNode = nodes.find(node => node.isRoot);
   
@@ -412,8 +412,8 @@ function initSimulation() {
 function createGraphData(response){
   let adjacency_plaintext = response.substring(response.indexOf("adjacency_list = {"), response.indexOf("}")+1);
   let explanation_plaintext = response.substring(response.indexOf("explanation_list = {"), response.lastIndexOf("}")+1);
-  console.log(adjacency_plaintext);                                                     
-  console.log(explanation_plaintext);
+  // console.log(adjacency_plaintext);                                                     
+  // console.log(explanation_plaintext);
   
   let adjacency_split = adjacency_plaintext.split("\n");
   for(let i = 1; i < adjacency_split.length-1; i++){
@@ -433,7 +433,7 @@ function createGraphData(response){
         }
       }
     }
-    console.log(line);
+    // console.log(line);
     if(line.length == 1){
       graph[line[0]] = [];
     }
@@ -460,7 +460,7 @@ function createGraphData(response){
         }
       }
     }
-    console.log(line);
+    // console.log(line);
     descriptions[line[0]] = line[1];
   }
 }
